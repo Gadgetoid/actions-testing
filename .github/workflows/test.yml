@@ -26,7 +26,7 @@ jobs:
       PICO_SDK_PATH: $GITHUB_WORKSPACE/pico-sdk
 
     steps:
-    - name: Download artifact
+    - name: Download Toolchain
       id: download-artifact
       uses: dawidd6/action-download-artifact@v2
       with:
@@ -36,3 +36,13 @@ jobs:
         branch: main
         repo: gadgetoid/arm-gnu-toolchain-build
         if_no_artifact_found: fail
+
+    - name: Unpack Toolchain & Add to PATH
+      run: |
+        tar xf */gcc-*.tar.bz2 -C .
+        cd gcc*/bin
+        pwd >> $GITHUB_PATH
+
+    - name: Test Toolchain
+      run: |
+        arm-none-eabi-gcc --version
