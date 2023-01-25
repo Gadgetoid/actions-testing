@@ -1,0 +1,38 @@
+name: CMake
+
+on:
+  push:
+  pull_request:
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    name: ${{matrix.name}}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-20.04
+            name: Linux
+            cache-key: linux
+            cmake-args: '-DPICO_SDK_PATH=$GITHUB_WORKSPACE/pico-sdk -DPICO_SDK_POST_LIST_DIRS=$GITHUB_WORKSPACE/pico-extras'
+            apt-packages: ccache gcc-arm-none-eabi
+
+    runs-on: ${{matrix.os}}
+
+    env:
+      PICO_SDK_PATH: $GITHUB_WORKSPACE/pico-sdk
+
+    steps:
+    - name: Download artifact
+      id: download-artifact
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        github_token: ${{secrets.GITHUB_TOKEN}}
+        workflow: build.yml
+        workflow_conclusion: success
+        branch: main
+        repo: gadgetoid/arm-gnu-toolchain-build
+        if_no_artifact_found: fail
